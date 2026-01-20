@@ -34,7 +34,7 @@ else:
         print(f"   ✅ Found: {v}")
 print("-" * 20)
 
-# 4. Import F5-TTS (Might take time)
+# 4. Import F5-TTS
 print("⏳ Importing F5-TTS Libraries (This might take a moment)...")
 try:
     from f5_tts.api import F5TTS
@@ -43,11 +43,11 @@ except Exception as e:
     print(f"❌ ERROR Importing F5-TTS: {e}")
     sys.exit(1)
 
-# 5. Load Model
+# 5. Load Model (FIXED INITIALIZATION)
 print("⏳ Loading F5-TTS Model into RAM...")
 try:
-    # Load the model (HuggingFace se auto download karega)
-    f5tts = F5TTS(model_type="F5-TTS", device=device)
+    # 🔴 FIX: Removed 'model_type' argument as newer version handles it automatically
+    f5tts = F5TTS(device=device) 
     print("✅ Model Loaded & Ready to Speak!")
 except Exception as e:
     print(f"❌ Model Load Failed: {e}")
@@ -75,7 +75,6 @@ async def speak(text: str = Form(...), speaker: str = Form(DEFAULT_VOICE)):
     # Check voice existence
     target_voice = speaker if os.path.exists(speaker) else DEFAULT_VOICE
     if not os.path.exists(target_voice):
-        # Agar default bhi nahi mila to pehli wav file utha lo
         target_voice = voice_files[0] if voice_files else None
     
     if not target_voice:
@@ -87,16 +86,13 @@ async def speak(text: str = Form(...), speaker: str = Form(DEFAULT_VOICE)):
 
     try:
         # 🔥 F5-TTS GENERATION
-        # This is where the magic happens. 
-        # It copies the emotion from 'target_voice' and applies it to 'text'
         wav, sr, _ = f5tts.infer(
             ref_file=target_voice,
-            ref_text="", # Blank rakhein taakay wo sirf tone copy kare
+            ref_text="", 
             gen_text=text,
             remove_silence=True,
         )
 
-        # Save to file
         sf.write(output_path, wav, sr)
         
         duration = time.time() - start_time
@@ -105,9 +101,8 @@ async def speak(text: str = Form(...), speaker: str = Form(DEFAULT_VOICE)):
         with open(output_path, "rb") as f:
             data = f.read()
         
-        # Cleanup
         if os.path.exists(output_path): os.remove(output_path)
-        gc.collect() # RAM Safai
+        gc.collect() 
         
         return Response(content=data, media_type="audio/wav")
 

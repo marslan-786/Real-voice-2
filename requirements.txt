@@ -1,0 +1,15 @@
+fastapi
+uvicorn
+python-multipart
+torch==2.1.0
+torchaudio==2.1.0
+numpy
+scipy
+soundfile
+librosa
+transformers
+accelerate
+diffusers
+cached_path
+wandb
+git+https://github.com/SWivid/F5-TTS.git

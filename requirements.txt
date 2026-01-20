@@ -8,9 +8,9 @@ scipy
 soundfile
 librosa
 transformers==4.40.0
-accelerate==0.27.0
 diffusers
 cached_path
 wandb
+accelerate
 git+https://github.com/openai/whisper.git
 git+https://github.com/SWivid/F5-TTS.git
